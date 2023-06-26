@@ -62,7 +62,7 @@ app.use(express.static('public'));
 //error handling middleware should always be defined last in a chain of middleware, but before the app.listen()
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Somrthing has gone wrong!');
+  res.status(500).send('Something has gone wrong!');
 });
 
 app.listen(8080, () => {
