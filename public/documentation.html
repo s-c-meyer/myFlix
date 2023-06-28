@@ -4,7 +4,7 @@
   <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>myFlix App</title>
+      <title>myFlix Documentation</title>
   </head>
 
 <body>
@@ -14,7 +14,68 @@
   </header>
 
   <div>
-    <p>This documentation will eventually talk more in detail about the REST API and being able to interface with it, along with how to use this myFlix app that will use said API</p>
+    <table style="width:100%; text-align:center; border-style: solid; border-width: 0.1em;">
+      <tr>
+        <th>Request</th>
+        <th>Method</th>
+        <th>URL</th>
+        <th>Response</th>
+      </tr>
+      <tr>
+        <td>Get All Movies</td>
+        <td>GET</td>
+        <td>localhost:8080/movies</td>
+        <td>This request returns a JSON object containing all of the movies and all of their respective data.</td>
+      </tr>
+      <tr>
+        <td>Get Movie by Title</td>
+        <td>GET</td>
+        <td>localhost:8080/movies/:title</td>
+        <td>This request returns a JSON Object of a single movie in the form of an array</td>
+      </tr>
+      <tr>
+        <td>Get Genre Data by Name</td>
+        <td>GET</td>
+        <td>locahost:8080/movies/genre/:genre</td>
+        <td>This request returns a JSON Object that contains information about a single genre, including the genre name and a short description</td>
+      </tr>
+      <tr>
+        <td>Get Director by Name</td>
+        <td>GET</td>
+        <td>locahost:8080/movies/directors/:directorName</td>
+        <td>This request returns a JSON Object that contains information about one director, including his name, a short biography, and his year of birth</td>
+      </tr>
+      <tr>
+        <td>Create New User</td>
+        <td>POST</td>
+        <td>locahost:8080/users</td>
+        <td>This request will create a new user with a unique user ID and return the new user object</td>
+      </tr>
+      <tr>
+        <td>Update Usernames</td>
+        <td>PUT</td>
+        <td>locahost:8080/users/:id</td>
+        <td>This request will update the username of user, provided the given username already exists to replace</td>
+      </tr>
+      <tr>
+        <td>Add to User's Favorite Movie List</td>
+        <td>POST</td>
+        <td>locahost:8080/users/:id/:movieTitle</td>
+        <td>This request will update the given user's favorite movie list with the provided movie, given the user id exists. It will return a message to confirm the movie has been added successfully</td>
+      </tr>
+      <tr>
+        <td>Remove from User's Favorite Movie List</td>
+        <td>DELETE</td>
+        <td>locahost:8080/users/:id/:movieTitle</td>
+        <td>This request will remove the specified movie from the provided user's favorite movie list, given the user id exists. It will return a message to confirm the movie has been added removed</td>
+      </tr>
+      <tr>
+        <td>Remove User</td>
+        <td>DELETE</td>
+        <td>locahost:8080/users/:id</td>
+        <td>This request will remove the specified user from the user's array if the user exists in the array. It will return a message to confirm the user has been deleted.</td>
+      </tr>
+    </table>
   </div>
 
 </body>
