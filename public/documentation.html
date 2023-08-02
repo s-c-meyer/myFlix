@@ -30,19 +30,19 @@
       <tr>
         <td>Get Movie by Title</td>
         <td>GET</td>
-        <td>localhost:8080/movies/:title</td>
+        <td>localhost:8080/movies/:Title</td>
         <td>This request returns a JSON Object of a single movie in the form of an array</td>
       </tr>
       <tr>
         <td>Get Genre Data by Name</td>
         <td>GET</td>
-        <td>locahost:8080/movies/genre/:genre</td>
+        <td>locahost:8080/genre/GenreName</td>
         <td>This request returns a JSON Object that contains information about a single genre, including the genre name and a short description</td>
       </tr>
       <tr>
         <td>Get Director by Name</td>
         <td>GET</td>
-        <td>locahost:8080/movies/directors/:directorName</td>
+        <td>locahost:8080/director/:directorName</td>
         <td>This request returns a JSON Object that contains information about one director, including his name, a short biography, and his year of birth</td>
       </tr>
       <tr>
@@ -54,25 +54,25 @@
       <tr>
         <td>Update Usernames</td>
         <td>PUT</td>
-        <td>locahost:8080/users/:id</td>
+        <td>locahost:8080/users/:Username</td>
         <td>This request will update the username of user, provided the given username already exists to replace</td>
       </tr>
       <tr>
         <td>Add to User's Favorite Movie List</td>
         <td>POST</td>
-        <td>locahost:8080/users/:id/:movieTitle</td>
+        <td>locahost:8080/users/:Username/movies/:MovieID</td>
         <td>This request will update the given user's favorite movie list with the provided movie, given the user id exists. It will return a message to confirm the movie has been added successfully</td>
       </tr>
       <tr>
         <td>Remove from User's Favorite Movie List</td>
         <td>DELETE</td>
-        <td>locahost:8080/users/:id/:movieTitle</td>
+        <td>locahost:8080/users/:Username/movies/:MovieID</td>
         <td>This request will remove the specified movie from the provided user's favorite movie list, given the user id exists. It will return a message to confirm the movie has been added removed</td>
       </tr>
       <tr>
         <td>Remove User</td>
         <td>DELETE</td>
-        <td>locahost:8080/users/:id</td>
+        <td>locahost:8080/users/:Username</td>
         <td>This request will remove the specified user from the user's array if the user exists in the array. It will return a message to confirm the user has been deleted.</td>
       </tr>
     </table>

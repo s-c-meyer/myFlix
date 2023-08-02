@@ -63,22 +63,21 @@ app.post('/users', (req, res) => {
   Birthday: Date
 }*/
 app.put('/users/:Username', (req, res) => {
-  Users.findOneAndUpdate({ Username: req.params.Username }, { $set:
+  Users.findOneAndUpdate({ Username: req.params.Username }, { $set: 
     {
       Username: req.body.Username,
       Password: req.body.Password,
       Email: req.body.Email,
       Birthday: req.body.Birthday
     }
-  },
-  { new: true }, //this line makes sure that the updated document is returned
-  (err, updatedUser) => {
-    if(err) {
-      console.error(err);
-      res.status(500).send('Error: ' + err)
-    } else {
-      res.json(updatedUser);
-    }
+  }, 
+  { new: true })
+  .then(updatedUser => {
+    res.json(updatedUser);
+  })
+  .catch(err => {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
   });
 });
 
@@ -94,7 +93,6 @@ app.get('/movies', (req, res) => {
     });
 });
 
-
 //GET Movie by Title
 app.get('/movies/:Title', (req, res) => {
   Movies.findOne({ Title: req.params.Title })
@@ -107,11 +105,12 @@ app.get('/movies/:Title', (req, res) => {
     });
 });
 
-//Returns the first movie with that specific genre
-app.get('/movies/genre/:Name', (req, res) => {
-  Movies.findOne({ Name: req.params.Name })
-    .then((movie) => {
-      res.json(movie);
+//GET Genre Info by Name
+app.get('/genre/:GenreName', (req, res) => {
+  const genreName = req.params.GenreName;
+  Movies.findOne({'Genre.Name' : genreName}, { 'Genre' : 1 }) // Use dot notation to access the Genre subdocument's Name property
+    .then((movies) => {
+      res.json(movies);
     })
     .catch((err) => {
       console.error(err);
@@ -119,11 +118,12 @@ app.get('/movies/genre/:Name', (req, res) => {
     });
 });
 
-//How the code is setup in the example from Exercise 2.7
-app.get('/genre/:Name', (req, res) => {
-  Genres.findOne({ Name: req.params.Name })
-    .then((genre) => {
-      res.json(genre.Description);
+//GET Director Info by Name
+app.get('/director/:DirectorName', (req, res) => {
+  const directorName = req.params.DirectorName;
+  Movies.findOne({ 'Director.Name': directorName }, {'Director' : 1}) // Use dot notation to access the Director subdocument's Name property
+    .then((movies) => {
+      res.json(movies);
     })
     .catch((err) => {
       console.error(err);
@@ -131,77 +131,49 @@ app.get('/genre/:Name', (req, res) => {
     });
 });
 
+//POST Favorite Movie to User's List
+app.post('/users/:Username/movies/:MovieID', async (req, res) => {
+  await Users.findOneAndUpdate({ Username: req.params.Username }, {
+    $addToSet: { FavoriteMovies: req.params.MovieID }
+  },
+  { new: true }) //This line makes sure that the updated document is returned
+  .then((updatedUser) => {
+    res.json(updatedUser);
+  })
+  .catch((err) => {
+  res.status(500).send('Error: ' + err);
+  });
+});
 
+//DELETE Favorite Movie to User's List
+app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
+  await Users.findOneAndUpdate({ Username: req.params.Username }, {
+    $pull: { FavoriteMovies: req.params.MovieID }
+  },
+  { new: true }) //This line makes sure that the updated document is returned
+  .then((updatedUser) => {
+    res.json(updatedUser);
+  })
+  .catch((err) => {
+  res.status(500).send('Error: ' + err);
+  });
+});
 
-
-//code from previous exercises
-
-// const express = require('express'), 
-//   morgan = require('morgan');
-
-// const app = express();
-
-// app.use(morgan('common'));
-
-// //JSON Object containing top 10 movies
-// let topMovies = [
-//   {
-//     title: 'The Dark Knight',
-//     director: 'Christopher Nolan'
-//   },
-//   {
-//     title: 'Pulp Fiction',
-//     director: 'Quentin Tarantino'
-//   },
-//   {
-//     title: 'Arrival',
-//     director: 'Denis Villeneuve'
-//   },
-//   {
-//     title: 'Moonlight',
-//     director: 'Barry Jenkins'
-//   },
-//   {
-//     title: 'Manchester by the Sea',
-//     director: 'Kenneth Lonergan'
-//   },
-//   {
-//     title: 'Star Wars Episode III - Revenge of the Sith',
-//     director: 'George Lucas'
-//   },
-//   {
-//     title: 'Harry Potter and the Goblet of Fire',
-//     director: 'Mike Newell'
-//   },
-//   {
-//     title: 'Anchorman: The Legend of Ron Burgundy',
-//     director: 'Adam McKay'
-//   },
-//   {
-//     title: 'Elf',
-//     director: 'Jon Favreau'
-//   },
-//   {
-//     title: 'Men In Black',
-//     director: 'Barry Sonnenfeld'
-//   }
-// ];
-
-// app.get('/', (req, res) => {
-//   res.send('Welcome to my movie app, MyFlix!');
-// });
-
-// app.get('/movies', (req, res) => {
-//   res.json(topMovies);
-// });
-
-// app.use(express.static('public'));
-
-// //error handling middleware should always be defined last in a chain of middleware, but before the app.listen()
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).send('Something has gone wrong!');
-// });
+//DELETE a user by username
+app.delete('/users/:Username', async (req, res) => {
+  await Users.findOneAndRemove({ Username: req.params.Username })
+  .then((user) => {
+    if (!user) {
+      res.status(400).send(req.params.Username + ' was not found.');
+    } else {
+      res.status(200).send(req.params.Username + ' was deleted.');
+    }
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  });
+});
 
 app.listen(8080, () => {
   console.log('Your app is listening on port 8080');
