@@ -11,6 +11,11 @@ const mongoose = require('mongoose'),
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+let auth = require('./auth')(app); //this must be placed after the above bodyParser middleware functions. (app) ensures that Express is available in auth.js file as well. 
+
+const passport = require('passport');
+require('./passport');
+
 
 mongoose.connect('mongodb://0.0.0.0:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true }); //allows Mongoose to connect to the database you created in MongoDB
 
@@ -62,7 +67,10 @@ app.post('/users', (req, res) => {
   (required)
   Birthday: Date
 }*/
-app.put('/users/:Username', (req, res) => {
+app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
+  if(req.user.Username !== req.params.Username){ //this if statement ensures that one user cannot edit another user's data
+    return res.status(400).send('Permission Denied');
+  }
   Users.findOneAndUpdate({ Username: req.params.Username }, { $set: 
     {
       Username: req.body.Username,
@@ -82,7 +90,7 @@ app.put('/users/:Username', (req, res) => {
 });
 
 //GET all Movies
-app.get('/movies', (req, res) => {
+app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
     .then((movies) => {
       res.status(201).json(movies);
@@ -94,7 +102,7 @@ app.get('/movies', (req, res) => {
 });
 
 //GET Movie by Title
-app.get('/movies/:Title', (req, res) => {
+app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ Title: req.params.Title })
     .then((movie) => {
       res.json(movie);
@@ -106,7 +114,7 @@ app.get('/movies/:Title', (req, res) => {
 });
 
 //GET Genre Info by Name
-app.get('/genre/:GenreName', (req, res) => {
+app.get('/genre/:GenreName', passport.authenticate('jwt', { session: false }), (req, res) => {
   const genreName = req.params.GenreName;
   Movies.findOne({'Genre.Name' : genreName}, { 'Genre' : 1 }) // Use dot notation to access the Genre subdocument's Name property
     .then((movies) => {
@@ -119,7 +127,7 @@ app.get('/genre/:GenreName', (req, res) => {
 });
 
 //GET Director Info by Name
-app.get('/director/:DirectorName', (req, res) => {
+app.get('/director/:DirectorName', passport.authenticate('jwt', { session: false }), (req, res) => {
   const directorName = req.params.DirectorName;
   Movies.findOne({ 'Director.Name': directorName }, {'Director' : 1}) // Use dot notation to access the Director subdocument's Name property
     .then((movies) => {
@@ -132,7 +140,10 @@ app.get('/director/:DirectorName', (req, res) => {
 });
 
 //POST Favorite Movie to User's List
-app.post('/users/:Username/movies/:MovieID', async (req, res) => {
+app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  if(req.user.Username !== req.params.Username){ //this if statement ensures that one user cannot edit another user's data
+    return res.status(400).send('Permission Denied');
+  }
   await Users.findOneAndUpdate({ Username: req.params.Username }, {
     $addToSet: { FavoriteMovies: req.params.MovieID }
   },
@@ -146,7 +157,10 @@ app.post('/users/:Username/movies/:MovieID', async (req, res) => {
 });
 
 //DELETE Favorite Movie to User's List
-app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
+app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  if(req.user.Username !== req.params.Username){ //this if statement ensures that one user cannot edit another user's data
+    return res.status(400).send('Permission Denied');
+  }
   await Users.findOneAndUpdate({ Username: req.params.Username }, {
     $pull: { FavoriteMovies: req.params.MovieID }
   },
@@ -160,7 +174,7 @@ app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
 });
 
 //DELETE a user by username
-app.delete('/users/:Username', async (req, res) => {
+app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndRemove({ Username: req.params.Username })
   .then((user) => {
     if (!user) {
