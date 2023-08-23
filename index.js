@@ -33,10 +33,13 @@ let auth = require('./auth')(app); //this must be placed after the above bodyPar
 const passport = require('passport');
 require('./passport');
 
-
 // mongoose.connect('mongodb://0.0.0.0:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true }); //allows Mongoose to connect to the database you created in MongoDB
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true }); //uses an environment variable generated in heroku to connect to MongoDB Atlas without exposing the URL 
 
+//An initial welcome message that displays on the index page of the app
+app.get('/', (req, res) => {
+  res.send('Welcome to MyFlix Movie Database!');
+})
 
 //Add a user
 /* We'll expect JSON in this format
