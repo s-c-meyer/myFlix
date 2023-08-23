@@ -24,6 +24,10 @@ passport.use(
             message: 'Incorrect username or password.', //an error message is sent if the username/password cannot be found in the database
           });
         }
+        if (!user.validatePassword(password)) { //validate the password entered by the user
+          console.log('incorrect password');
+          return callback(null, false, { message: 'Incorrect password.' });
+        }
         console.log('finished');
         return callback(null, user);
       })

@@ -11,6 +11,23 @@ const mongoose = require('mongoose'),
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const { check, validationResult } = require('express-validator');
+
+const cors = require('cors');
+
+//list of domains allowed access to the API
+let allowedOrigins = ['http://localhost8080', 'http://testsite.com']
+app.use(cors({
+  origin: (origin, callback) => {
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){ //If a specific origin isn't found on the list of allowed origins 
+      let message = 'The CORS Policy for this application doesn\'t allow access from origin ' + origin;
+      return callback(new Error(message ), false);
+    }
+    return callback(null, true);
+  }
+}));
+
 let auth = require('./auth')(app); //this must be placed after the above bodyParser middleware functions. (app) ensures that Express is available in auth.js file as well. 
 
 const passport = require('passport');
@@ -28,7 +45,21 @@ mongoose.connect('mongodb://0.0.0.0:27017/myFlixDB', { useNewUrlParser: true, us
   Email: String, 
   Birthday: Date
 }*/
-app.post('/users', (req, res) => {
+app.post('/users',
+  //all of the validation logic for the request 
+  [
+    check('Username', 'Username is required(5 or more characters').isLength({min: 5}),
+    check('Username', 'Username must contain only alpha-numeric characters').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be valid').isEmail()
+  ], (req, res) => {  
+    //check the validation object for errors
+    let errors = validationResult(req);
+    if(!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
+  let hashedPassword = Users.hashPassword(req.body.Password); //hash the submitted password using bcrypt
   Users.findOne({ Username: req.body.Username })
     .then((user) => {
       if (user) {
@@ -37,7 +68,7 @@ app.post('/users', (req, res) => {
         Users
           .create({
             Username: req.body.Username,
-            Password: req.body.Password,
+            Password: hashedPassword, //store the hashed password, not the original submitted one
             Email: req.body.Email,
             Birthday: req.body.Birthday
           })
@@ -189,6 +220,8 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
   });
 });
 
-app.listen(8080, () => {
-  console.log('Your app is listening on port 8080');
+//This will search for a pre-configured port number in the environment variable, and if nothing is found, sets the port to a certain port number. 
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0',() => {
+  console.log('Listening on Port ' + port);
 });
