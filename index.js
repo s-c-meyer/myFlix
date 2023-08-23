@@ -34,7 +34,9 @@ const passport = require('passport');
 require('./passport');
 
 
-mongoose.connect('mongodb://0.0.0.0:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true }); //allows Mongoose to connect to the database you created in MongoDB
+// mongoose.connect('mongodb://0.0.0.0:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true }); //allows Mongoose to connect to the database you created in MongoDB
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true }); //uses an environment variable generated in heroku to connect to MongoDB Atlas without exposing the URL 
+
 
 //Add a user
 /* We'll expect JSON in this format
