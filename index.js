@@ -100,9 +100,22 @@ app.post('/users',
   (required)
   Birthday: Date
 }*/
-app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
-  if(req.user.Username !== req.params.Username){ //this if statement ensures that one user cannot edit another user's data
+app.put('/users/:Username', 
+  [
+    check('Username', 'Username is required(5 or more characters').isLength({min: 5}),
+    check('Username', 'Username must contain only alpha-numeric characters').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be valid').isEmail()
+  ],
+passport.authenticate('jwt', { session: false }), (req, res) => {
+  //Ensure that one user cannot edit another user's data
+  if(req.user.Username !== req.params.Username){ 
     return res.status(400).send('Permission Denied');
+  }
+  //Check validation object for errors
+  let errors = validationResult(req);
+  if(!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
   }
   Users.findOneAndUpdate({ Username: req.params.Username }, { $set: 
     {
