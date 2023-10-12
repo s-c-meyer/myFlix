@@ -93,23 +93,14 @@ app.post('/users',
 });
 
 //UPDATE a user's info, by username
-/* We'll expect JSON in this format
-{
-  Username: String,
-  (required)
-  Password: String,
-  (required)
-  Email: String,
-  (required)
-  Birthday: Date
-}*/
+//this does not require all of the same validation as before, because 
 app.put('/users/:Username', 
-  [
-    check('Username', 'Username is required(5 or more characters').isLength({min: 5}),
-    check('Username', 'Username must contain only alpha-numeric characters').isAlphanumeric(),
-    check('Password', 'Password is required').not().isEmpty(),
-    check('Email', 'Email does not appear to be valid').isEmail()
-  ],
+  // [
+  //   check('Username', 'Username must be 5 or more characters').isLength({min: 5}),
+  //   check('Username', 'Username must contain only alpha-numeric characters').isAlphanumeric(),
+  //   check('Password', 'Password is required').not().isEmpty(),
+  //   check('Email', 'Email does not appear to be valid').isEmail()
+  // ],
 passport.authenticate('jwt', { session: false }), (req, res) => {
   //Ensure that one user cannot edit another user's data
   if(req.user.Username !== req.params.Username){ 
