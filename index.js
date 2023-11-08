@@ -16,7 +16,7 @@ const { check, validationResult } = require('express-validator');
 const cors = require('cors');
 
 //list of domains allowed access to the API
-let allowedOrigins = ['http://localhost8080', 'http://testsite.com', 'http://localhost:1234']
+let allowedOrigins = ['http://localhost8080', 'http://testsite.com', 'http://localhost:1234', 'https://meyersmovies.netlify.app/']
 app.use(cors({
   origin: (origin, callback) => {
     if(!origin) return callback(null, true);
@@ -93,7 +93,7 @@ app.post('/users',
 });
 
 //UPDATE a user's info, by username
-//this does not require all of the same validation as before, because 
+//this does not require all of the same validation as before
 app.put('/users/:Username', 
   // [
   //   check('Username', 'Username must be 5 or more characters').isLength({min: 5}),
