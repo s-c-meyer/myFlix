@@ -50,6 +50,17 @@ app.get('/', (req, res) => {
   Email: String, 
   Birthday: Date
 }*/
+
+/**
+ * Add a user into the database
+ * Expects JSON in this format:
+ * @param {number} ID - the id of the user
+ * @param {string} Username - username displayed for the user
+ * @param {string} Password - password to be hashed
+ * @param {string} Email - valid email for the user
+ * @param {date} Birthday - valid birthday for the user
+ * @returns {user}
+ */
 app.post('/users',
   //all of the validation logic for the request 
   [
