@@ -41,19 +41,9 @@ app.get('/', (req, res) => {
   res.send('Welcome to MyFlix Movie Database!');
 })
 
-//Add a user
-/* We'll expect JSON in this format
-{
-  ID: Integer,
-  Username: String, 
-  Password: String,
-  Email: String, 
-  Birthday: Date
-}*/
-
 /**
- * Add a user into the database
- * Expects JSON in this format:
+ * @function
+ * POST a user into the database
  * @param {number} ID - the id of the user
  * @param {string} Username - username displayed for the user
  * @param {string} Password - password to be hashed
@@ -104,15 +94,18 @@ app.post('/users',
 });
 
 //UPDATE a user's info, by username
-//this does not require all of the same validation as before
-app.put('/users/:Username', 
-  // [
-  //   check('Username', 'Username must be 5 or more characters').isLength({min: 5}),
-  //   check('Username', 'Username must contain only alpha-numeric characters').isAlphanumeric(),
-  //   check('Password', 'Password is required').not().isEmpty(),
-  //   check('Email', 'Email does not appear to be valid').isEmail()
-  // ],
-passport.authenticate('jwt', { session: false }), (req, res) => {
+/**
+ * @function
+ * UPDATE a user's info, by username.
+ * Expects JSON in the below format
+ * @param {number} ID - the id of the user
+ * @param {string} Username - username displayed for the user
+ * @param {string} Password - password to be hashed
+ * @param {string} Email - valid email for the user
+ * @param {date} Birthday - valid birthday for the user
+ * @returns {user}
+ */
+app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
   //Ensure that one user cannot edit another user's data
   if(req.user.Username !== req.params.Username){ 
     return res.status(400).send('Permission Denied');
@@ -141,6 +134,12 @@ passport.authenticate('jwt', { session: false }), (req, res) => {
 });
 
 //GET all Movies
+/**
+ * @function
+ * GET all movies from the database. 
+ * @returns
+ * Array of movies 
+ */
 app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
     .then((movies) => {
@@ -152,7 +151,13 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) 
     });
 });
 
-//GET Movie by Title
+/**
+ * @function
+ * GET Movie by Title
+ * @param {string} movieTitle - the title of the selected movie
+ * @returns
+ * A single movie object
+ */
 app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.findOne({ Title: req.params.Title })
     .then((movie) => {
@@ -164,7 +169,13 @@ app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), (req
     });
 });
 
-//GET Genre Info by Name
+/**
+ * @function
+ * GET Genre Info by Name
+ * @param {string} genreName - the name of the selected genre
+ * @returns
+ * A single genre object 
+ */
 app.get('/genre/:GenreName', passport.authenticate('jwt', { session: false }), (req, res) => {
   const genreName = req.params.GenreName;
   Movies.findOne({'Genre.Name' : genreName}, { 'Genre' : 1 }) // Use dot notation to access the Genre subdocument's Name property
@@ -178,6 +189,13 @@ app.get('/genre/:GenreName', passport.authenticate('jwt', { session: false }), (
 });
 
 //GET Director Info by Name
+/**
+ * @function
+ * GET Director Info by Name
+ * @param {string} directorName - the name of the selected director
+ * @returns
+ * A single director object
+ */
 app.get('/director/:DirectorName', passport.authenticate('jwt', { session: false }), (req, res) => {
   const directorName = req.params.DirectorName;
   Movies.findOne({ 'Director.Name': directorName }, {'Director' : 1}) // Use dot notation to access the Director subdocument's Name property
@@ -190,7 +208,14 @@ app.get('/director/:DirectorName', passport.authenticate('jwt', { session: false
     });
 });
 
-//POST Favorite Movie to User's List
+/**
+ * @function
+ * POST Favorite Movie to User's List
+ * @param {string} Username - add to the favorite movie list of this user
+ * @param {string} movieID - the unique identifier of the movie to be added to the list
+ * @returns
+ * The user object with the updated favorite movies list 
+ */
 app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if(req.user.Username !== req.params.Username){ //this if statement ensures that one user cannot edit another user's data
     return res.status(400).send('Permission Denied');
@@ -207,7 +232,14 @@ app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { sess
   });
 });
 
-//DELETE Favorite Movie to User's List
+/**
+ * @function
+ * DELETE Favorite Movie to User's List
+ * @param {string} Username - remove from the favorite movie list of this user
+ * @param {string} movieID - the unique identifier of the movie to be removed from the list
+ * @returns
+ * The user object with the updated favorite movies list 
+ */
 app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
   if(req.user.Username !== req.params.Username){ //this if statement ensures that one user cannot edit another user's data
     return res.status(400).send('Permission Denied');
@@ -224,7 +256,11 @@ app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { se
   });
 });
 
-//DELETE a user by username
+/**
+ * @function
+ * DELETE a user by username
+ * @param {string} Username - the user to be deleted
+ */
 app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndRemove({ Username: req.params.Username })
   .then((user) => {
