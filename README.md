@@ -1,4 +1,4 @@
-# myFlix
+# Meyer's Movies Database API
 
 myFlix is a REST API that interacts with a MongoDB database of movies. This API is used in two of my other projects, which use both [React](https://github.com/s-c-meyer/myFlix-client) and [Angular](https://github.com/s-c-meyer/myFlix-Angular-client). The API was tested using Postman and is deployed to Heroku. 
 
