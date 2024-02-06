@@ -312,7 +312,7 @@ app.get('/imageslist', (req, res) => {
 });
 
 //uploads an image to a specific S3 Bucket
-app.post('/imagesupload', async (req, res) => {
+app.post('/images', async (req, res) => {
   const file = req.files.file //does not work with req.files.image
   const fileName = req.files.file.name //does not work with req.files.image.name
 
