@@ -288,8 +288,8 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
 const s3Client = new S3Client({
   region: 'us-east-1',
   credentials: {
-    accessKeyId: 'AKIA23AW4GT3ZM742ITT',
-    secretAccessKey: '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'
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY
   }
 });
 
