@@ -297,7 +297,7 @@ let listObjectParams = {
 listObjectsCmd = new ListObjectsV2Command(listObjectParams); //not sure this is necessary?
 
 //gets a list of objects from a specific S3 bucket 
-app.get('/images', (req, res) => {
+app.get('/imageslist', (req, res) => {
   listObjectParams = {
     Bucket: 'ach-2-images'
   }
