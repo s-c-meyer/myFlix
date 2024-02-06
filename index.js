@@ -8,6 +8,11 @@ const mongoose = require('mongoose'),
   Genres = Models.Genre,
   Directors = Models.Director;
 
+const { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const fileUpload = require('express-fileupload')
+
+app.use(fileUpload());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -274,6 +279,73 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
     console.error(err);
     res.status(500).send('Error: ' + err);
   });
+});
+
+//these functions were added for AWS integration, for downloading/uploading photos to an S3 bucket
+
+//Instantiate an S3 Client object from the S3Client class
+//here is where you would also pass in AWS Credentials if they were necessary, you could use Environment Variables for this to uphold anonymity
+const s3Client = new S3Client({
+  region: 'us-east-1'
+});
+
+//Instantiate a command from the ListObjectsV2Command class
+let listObjectParams = {
+  Bucket: 'ach-2-images'
+};
+
+listObjectsCmd = new ListObjectsV2Command(listObjectParams); //not sure this is necessary?
+
+//gets a list of objects from a specific S3 bucket 
+app.get('/images', (req, res) => {
+  listObjectParams = {
+    Bucket: 'ach-2-images'
+  }
+  s3Client.send(new ListObjectsV2Command(listObjectParams)) //.send will execute the command
+    .then((listObjectsResponse) => {
+      res.send(listObjectsResponse)
+    })
+});
+
+//uploads an image to a specific S3 Bucket
+app.post('/imagesupload', async (req, res) => {
+  const file = req.files.file //does not work with req.files.image
+  const fileName = req.files.file.name //does not work with req.files.image.name
+
+  const bucketParams = {
+    Bucket: 'ach-2-images',
+    Key: fileName,
+    Body: file.data,
+  };
+
+  try {
+    const data = await s3Client.send(new PutObjectCommand(bucketParams));
+    res.send(data)
+  } catch (err) {
+    console.log("Error", err);
+    res.status(500).send('Error uploading file to S3 Bucket');
+  }
+});
+
+app.get('/images/:filename', async (req, res) => {
+  const fileName = req.params.filename;
+
+  const getObjectParams = {
+    Bucket: 'ach-2-images',
+    Key: fileName,
+  };
+
+  try {
+    const { Body, ContentType } = await s3Client.send(new GetObjectCommand(getObjectParams));
+
+    res.setHeader('Content-disposition', `attachment; filename=${fileName}`); //this causes the browser to prompt a download, and identifies the file as an attachment to be downloaded, with the filename from the S3 bucket
+    res.setHeader('Content-type', ContentType || 'application/octet-stream');
+
+    Body.pipe(res);
+  } catch (err) {
+    console.error(err);
+    res.status(404).send('File not Found');
+  }
 });
 
 //This will search for a pre-configured port number in the environment variable, and if nothing is found, sets the port to a certain port number. 
