@@ -286,7 +286,11 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
 //Instantiate an S3 Client object from the S3Client class
 //here is where you would also pass in AWS Credentials if they were necessary, you could use Environment Variables for this to uphold anonymity
 const s3Client = new S3Client({
-  region: 'us-east-1'
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: 'AKIA23AW4GT3ZM742ITT',
+    secretAccessKey: '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'
+  }
 });
 
 //Instantiate a command from the ListObjectsV2Command class
