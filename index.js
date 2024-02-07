@@ -439,7 +439,7 @@ app.get('/images/:filename', async (req, res) => {
   };
 
   try {
-    const { Body } = await s3Client.send(new GetObjectCommand(getObjectParams));
+    const { Body, ContentType } = await s3Client.send(new GetObjectCommand(getObjectParams));
 
     //res.setHeader('Content-disposition', `attachment; filename=${fileName}`); //this causes the browser to prompt a download, and identifies the file as an attachment to be downloaded, with the filename from the S3 bucket
     res.setHeader('Content-type', ContentType || 'image/jpg');
