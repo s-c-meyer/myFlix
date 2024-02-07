@@ -355,6 +355,19 @@ app.post('/images', async (req, res) => {
   }
 });
 
+//use upload utility from aws-sdk/lib-storage
+const upload = new Upload({
+  client: s3Client,
+  params: {
+    Bucket: bucketName,
+    Key: function (req, file, cb) {
+      cb(null, Date.now().toString() + '-' + file.originalname);
+    },
+    Body: readableStream,
+    GrantFullControl: 'public-read'
+  },
+});
+
 //upload an imagev2 where the browser will prompt you
 app.post('/imagesupload', upload.single('file'), async (req, res) => {
   try{
@@ -380,16 +393,7 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
     //   //ACL: 'public-read',
     // };
 
-    //use upload utility from aws-sdk/lib-storage
-    const upload = new Upload({
-      client: s3Client,
-      params: {
-        Bucket: bucketName,
-        Key: fileName,
-        Body: readableStream,
-        GrantFullControl: 'public-read'
-      },
-    });
+    
 
 
     await upload.done(); //wait for the upload to complete
