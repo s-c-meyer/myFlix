@@ -9,6 +9,7 @@ const mongoose = require('mongoose'),
   Directors = Models.Director;
  
 const multer = require('multer');
+const multerS3 = require('multer-s3');
 const { Readable } = require('stream');
 const { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const fileUpload = require('express-fileupload')
@@ -298,12 +299,19 @@ const s3Client = new S3Client({
 
 //Configure Multer to use S3
 const upload = multer({
-  storage: multerS3Storage(),
+  storage: multerS3({
+    s3: s3Client,
+    bucket: 'ach-2-images',
+    acl:'public-read',
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString() + '-' + file.originalname);
+    },
+  }),
 });
 
-function multerS3Storage() {
-  return multer.memoryStorage();
-}
+// function multerS3Storage() {
+//   return multer.memoryStorage();
+// }
 
 //Instantiate a command from the ListObjectsV2Command class
 let listObjectParams = {
