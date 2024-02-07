@@ -429,7 +429,7 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
 //   }
 // });
 
-//prompt the browser to download the image --  THIS WORKS TO DOWNLOAD THE IMAGE, BUT I WANT TO GET THE ACTUAL IMAGE TO USE IT, NOT DOWNLOAD IT LOCALLY
+//prompt the browser to download the image
 app.get('/images/:filename', async (req, res) => {
   const fileName = req.params.filename;
 
@@ -442,7 +442,7 @@ app.get('/images/:filename', async (req, res) => {
     const { Body } = await s3Client.send(new GetObjectCommand(getObjectParams));
 
     //res.setHeader('Content-disposition', `attachment; filename=${fileName}`); //this causes the browser to prompt a download, and identifies the file as an attachment to be downloaded, with the filename from the S3 bucket
-    res.setHeader('Content-type', ContentType || 'application/octet-stream');
+    res.setHeader('Content-type', ContentType || 'image/jpg');
 
     Body.pipe(res);
   } catch (err) {
