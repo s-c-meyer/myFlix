@@ -12,9 +12,9 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 const { Readable } = require('stream');
 const { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
-const fileUpload = require('express-fileupload')
+//const fileUpload = require('express-fileupload')
 
-app.use(fileUpload());
+//app.use(fileUpload());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
