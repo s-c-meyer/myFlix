@@ -359,7 +359,7 @@ app.post('/images', async (req, res) => {
 const upload = new Upload({
   client: s3Client,
   params: {
-    Bucket: bucketName,
+    Bucket: 'ach-2-images',
     Key: function (req, file, cb) {
       cb(null, Date.now().toString() + '-' + file.originalname);
     },
