@@ -390,6 +390,7 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
         Body: readableStream,
         //GrantFullControl: 'public-read', // Set the ACL using GrantFullControl
       },
+      partSize: 1024 * 1024 * 1, //optional size of each part, in bytes, at least 1MB
     });
 
     await upload.done(); //wait for the upload to complete
