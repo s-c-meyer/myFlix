@@ -302,7 +302,7 @@ const upload = multer({
   storage: multerS3({
     s3: s3Client,
     bucket: 'ach-2-images',
-    acl:'public-read',
+    //acl:'public-read',
     key: function (req, file, cb) {
       cb(null, Date.now().toString() + '-' + file.originalname);
     },
@@ -373,7 +373,7 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
       Bucket: bucketName,
       Key: fileName,
       Body: readableStream,
-      ACL: 'public-read',
+      //ACL: 'public-read',
     };
 
     await s3Client.send( new PutObjectCommand(uploadParams));
