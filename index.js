@@ -393,7 +393,7 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
     //   },
     // });
 
-    await upload.done(); //wait for the upload to complete
+    //await upload.done(); //wait for the upload to complete
 
     //await s3Client.send( new PutObjectCommand(uploadParams));
 
