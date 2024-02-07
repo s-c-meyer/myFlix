@@ -8,8 +8,9 @@ const mongoose = require('mongoose'),
   Genres = Models.Genre,
   Directors = Models.Director;
  
-const multer = require('multer');
-const multerS3 = require('multer-s3');
+// const multer = require('multer');
+// const multerS3 = require('multer-s3');
+const { Upload } = require('@aws-sdk/lib-storage')
 const { Readable } = require('stream');
 const { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 //const fileUpload = require('express-fileupload')
@@ -298,16 +299,19 @@ const s3Client = new S3Client({
 });
 
 //Configure Multer to use S3
-const upload = multer({
-  storage: multerS3({
-    s3: s3Client,
-    bucket: 'ach-2-images',
-    //acl:'public-read',
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString() + '-' + file.originalname);
-    },
-  }),
-});
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3Client,
+//     bucket: 'ach-2-images',
+//     //acl:'public-read',
+//     key: function (req, file, cb) {
+//       cb(null, Date.now().toString() + '-' + file.originalname);
+//     },
+//   }),
+// });
+
+
+
 
 // function multerS3Storage() {
 //   return multer.memoryStorage();
@@ -369,14 +373,28 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
     readableStream.push(null);
 
     //upload the image to S3
-    const uploadParams = {
-      Bucket: bucketName,
-      Key: fileName,
-      Body: readableStream,
-      //ACL: 'public-read',
-    };
+    // const uploadParams = {
+    //   Bucket: bucketName,
+    //   Key: fileName,
+    //   Body: readableStream,
+    //   //ACL: 'public-read',
+    // };
 
-    await s3Client.send( new PutObjectCommand(uploadParams));
+    //use upload utility from aws-sdk/lib-storage
+    const upload = new Upload({
+      client: s3Client,
+      params: {
+        Bucket: bucketName,
+        Key: fileName,
+        Body: readableStream,
+        GrantFullControl: 'public-read'
+      },
+    });
+
+
+    await upload.done(); //wait for the upload to complete
+
+    //await s3Client.send( new PutObjectCommand(uploadParams));
 
     const imageUrl = `https://${bucketName}.s3.amazonaws.com/${fileName}`;
     console.log('Image uploaded to:', imageUrl);
