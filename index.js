@@ -388,7 +388,7 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
         Bucket: bucketName,
         Key: fileName,
         Body: readableStream,
-        GrantFullControl: 'public-read', // Set the ACL using GrantFullControl
+        //GrantFullControl: 'public-read', // Set the ACL using GrantFullControl
       },
     });
 
