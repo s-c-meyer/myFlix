@@ -365,8 +365,8 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
     }
 
     const fileData = req.file.buffer;
-    const fileName = req.file.originalname;
-    //const fileName = `${Date.now()}-${req.file.originalname}`;
+    const fileName = req.file.originalname; //this filename upload is corrupted for some reason? This file gets corrupted.
+    //const fileName = `${Date.now()}-${req.file.originalname}`; 
     const bucketName = 'ach-2-images';
 
     //convert buffer to Readable Stream
@@ -383,15 +383,15 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
     //   //ACL: 'public-read',
     // };
 
-    const upload = new Upload({
-      client: s3Client,
-      params: {
-        Bucket: bucketName,
-        Key: fileName,
-        Body: readableStream,
-        //GrantFullControl: 'public-read', // Set the ACL using GrantFullControl
-      },
-    });
+    // const upload = new Upload({
+    //   client: s3Client,
+    //   params: {
+    //     Bucket: bucketName,
+    //     Key: fileName,
+    //     Body: readableStream,
+    //     //GrantFullControl: 'public-read', // Set the ACL using GrantFullControl
+    //   },
+    // });
 
     await upload.done(); //wait for the upload to complete
 
