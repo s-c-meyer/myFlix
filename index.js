@@ -7,7 +7,9 @@ const mongoose = require('mongoose'),
   Users = Models.User,
   Genres = Models.Genre,
   Directors = Models.Director;
-
+ 
+const multer = require('multer');
+const { Readable } = require('stream');
 const { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const fileUpload = require('express-fileupload')
 
@@ -36,6 +38,7 @@ app.use(cors({
 let auth = require('./auth')(app); //this must be placed after the above bodyParser middleware functions. (app) ensures that Express is available in auth.js file as well. 
 
 const passport = require('passport');
+const { read } = require('fs');
 require('./passport');
 
 // mongoose.connect('mongodb://0.0.0.0:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true }); //allows Mongoose to connect to the database you created in MongoDB
@@ -293,6 +296,15 @@ const s3Client = new S3Client({
   }
 });
 
+//Configure Multer to use S3
+const upload = multer({
+  storage: multerS3Storage(),
+});
+
+function multerS3Storage() {
+  return multer.memoryStorage();
+}
+
 //Instantiate a command from the ListObjectsV2Command class
 let listObjectParams = {
   Bucket: 'ach-2-images'
@@ -328,6 +340,43 @@ app.post('/images', async (req, res) => {
   } catch (err) {
     console.log("Error", err);
     res.status(500).send('Error uploading file to S3 Bucket');
+  }
+});
+
+//upload an imagev2 where the browser will prompt you
+app.post('/imagesupload', upload.single('file'), async (req, res) => {
+  try{
+    if (!req.file) {
+      return res.status(400)/json({ error: 'No File Provided '});
+    }
+
+    const fileData = req.file.buffer;
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+    const bucketName = 'ach-2-images';
+
+    //convert buffer to Readable Stream
+    const readableStream = new Readable();
+    readableStream._read = () => {};
+    readableStream.push(fileData);
+    readableStream.push(null);
+
+    //upload the image to S3
+    const uploadParams = {
+      Bucket: bucketName,
+      Key: fileName,
+      Body: readableStream,
+      ACL: 'public-read',
+    };
+
+    await s3Client.send( new PutObjectCommand(uploadParams));
+
+    const imageUrl = `https://${bucketName}.s3.amazonaws.com/${fileName}`;
+    console.log('Image uploaded to:', imageUrl);
+
+    res.status(200).json({ imageUrl });
+  } catch (error) {
+    console.error('Error uploading image: ' + error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
