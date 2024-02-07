@@ -8,8 +8,8 @@ const mongoose = require('mongoose'),
   Genres = Models.Genre,
   Directors = Models.Director;
  
-// const multer = require('multer');
-// const multerS3 = require('multer-s3');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
 const { Upload } = require('@aws-sdk/lib-storage')
 const { Readable } = require('stream');
 const { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
@@ -299,16 +299,16 @@ const s3Client = new S3Client({
 });
 
 //Configure Multer to use S3
-// const upload = multer({
-//   storage: multerS3({
-//     s3: s3Client,
-//     bucket: 'ach-2-images',
-//     //acl:'public-read',
-//     key: function (req, file, cb) {
-//       cb(null, Date.now().toString() + '-' + file.originalname);
-//     },
-//   }),
-// });
+const upload = multer({
+  storage: multerS3({
+    s3: s3Client,
+    bucket: 'ach-2-images',
+    //acl:'public-read',
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString() + '-' + file.originalname);
+    },
+  }),
+});
 
 
 
@@ -355,18 +355,7 @@ app.post('/images', async (req, res) => {
   }
 });
 
-//use upload utility from aws-sdk/lib-storage
-const upload = new Upload({
-  client: s3Client,
-  params: {
-    Bucket: 'ach-2-images',
-    Key: function (req, file, cb) {
-      cb(null, Date.now().toString() + '-' + file.originalname);
-    },
-    Body: readableStream,
-    GrantFullControl: 'public-read'
-  },
-});
+
 
 //upload an imagev2 where the browser will prompt you
 app.post('/imagesupload', upload.single('file'), async (req, res) => {
@@ -393,8 +382,15 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
     //   //ACL: 'public-read',
     // };
 
-    
-
+    const upload = new Upload({
+      client: s3Client,
+      params: {
+        Bucket: bucketName,
+        Key: fileName,
+        Body: readableStream,
+        GrantFullControl: 'public-read', // Set the ACL using GrantFullControl
+      },
+    });
 
     await upload.done(); //wait for the upload to complete
 
