@@ -407,6 +407,28 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
   }
 });
 
+// //prompt the browser to download the image -- changing inline to attachment will cause the browser to prompt a download of the image. 
+// app.get('/images/open/:filename', async (req, res) => {
+//   const fileName = req.params.filename;
+
+//   const getObjectParams = {
+//     Bucket: 'ach-2-images',
+//     Key: fileName,
+//   };
+
+//   try {
+//     const { Body, ContentType } = await s3Client.send(new GetObjectCommand(getObjectParams));
+
+//     res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
+//     res.setHeader('Content-type', ContentType || 'application/octet-stream');
+
+//     Body.pipe(res);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(404).send('File not Found');
+//   }
+// });
+
 //prompt the browser to download the image -- changing inline to attachment will cause the browser to prompt a download of the image. 
 app.get('/images/open/:filename', async (req, res) => {
   const fileName = req.params.filename;
@@ -419,7 +441,7 @@ app.get('/images/open/:filename', async (req, res) => {
   try {
     const { Body, ContentType } = await s3Client.send(new GetObjectCommand(getObjectParams));
 
-    res.setHeader('Content-disposition', `inline; filename=${fileName}`);
+    res.setHeader( 'Content-disposition', 'inline');
     res.setHeader('Content-type', ContentType || 'application/octet-stream');
 
     Body.pipe(res);
