@@ -442,7 +442,7 @@ app.get('/images/open/:filename', async (req, res) => {
     const { Body, ContentType } = await s3Client.send(new GetObjectCommand(getObjectParams));
 
     res.setHeader( 'Content-disposition', 'inline');
-    //res.setHeader('Content-type', ContentType || 'application/octet-stream');
+    res.setHeader('Content-type', ContentType || 'image/jpeg');
 
     Body.pipe(res);
   } catch (err) {
