@@ -365,8 +365,8 @@ app.post('/imagesupload', upload.single('file'), async (req, res) => {
     }
 
     const fileData = req.file.buffer;
-    const fileName = req.file.fieldname; //changed original name to field name
-    //const fileName = `${Date.now()}-${req.file.originalname}`; 
+    const fileName = req.file.originalname;
+    console.log("filename before upload is: " + req.file.originalname)
     const bucketName = 'ach-2-images';
 
     //convert buffer to Readable Stream
