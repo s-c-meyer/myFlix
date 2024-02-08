@@ -361,11 +361,11 @@ app.post('/images', async (req, res) => {
 app.post('/imagesupload', upload.single('file'), async (req, res) => {
   try{
     if (!req.file) {
-      return res.status(400)/json({ error: 'No File Provided '});
+      return res.status(400).json({ error: 'No File Provided '});
     }
 
     const fileData = req.file.buffer;
-    const fileName = req.file.originalname; //this filename upload is corrupted for some reason? This file gets corrupted.
+    const fileName = req.file.fieldname; //changed original name to field name
     //const fileName = `${Date.now()}-${req.file.originalname}`; 
     const bucketName = 'ach-2-images';
 
