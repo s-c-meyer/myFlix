@@ -304,9 +304,6 @@ const upload = multer({
     s3: s3Client,
     bucket: 'ach-2-images',
     //acl:'public-read',
-    // key: function (req, file, cb) {
-    //   cb(null, Date.now().toString() + '-' + file.originalname);
-    // },
     key: function (req, file, cb) {
       cb(null, 'original-images/' + file.originalname);
     },
