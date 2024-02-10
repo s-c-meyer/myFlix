@@ -25,7 +25,7 @@ const { check, validationResult } = require('express-validator');
 const cors = require('cors');
 
 //list of domains allowed access to the API
-let allowedOrigins = ['http://localhost8080', 'http://testsite.com', 'http://localhost:1234', 'https://meyersmovies.netlify.app', 'http://localhost:4200']
+let allowedOrigins = ['http://ach-2-code.s3-website-us-east-1.amazonaws.com/', 'http://localhost8080', 'http://testsite.com', 'http://localhost:1234', 'https://meyersmovies.netlify.app', 'http://localhost:4200']
 app.use(cors({
   origin: (origin, callback) => {
     if(!origin) return callback(null, true);
